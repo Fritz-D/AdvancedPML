@@ -16,6 +16,11 @@ p3(p1, N=20) = sum(p(s1,s2,p1,p2,d) for (s1,s2,p2,d)  in Iterators.product(1:N, 
 p4(p2, N=20) = sum(p(s1,s2,p1,p2,d) for (s1,s2,p1,d)  in Iterators.product(1:N, 1:N, 1:N, -N:N))
 p5(d,  N=20) = sum(p(s1,s2,p1,p2,d) for (s1,s2,p1,p2) in Iterators.product(1:N, 1:N, 1:N,  1:N))
 
+# (b)
+m_f1s1(s1) = f1(s1)
+m_f3s2(s2) = f3(s2)
+
+
 # (c)
 N, μ1, μ2, σ1, σ2, β = 20, 8, 12, 2, 2, 3
 
