@@ -1,4 +1,5 @@
 using BenchmarkTools
+using OffsetArrays
 
 # priors
 N, μ1, μ2, σ1, σ2, β = 20, 8, 12, 2, 2, 3
