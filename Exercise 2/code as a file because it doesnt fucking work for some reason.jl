@@ -20,30 +20,32 @@ pm_p2(p2) = sum(pm(s1,s2,p1,p2,d) for (s1,s2,p1,d)  in Iterators.product(1:N, 1:
 pm_d(d)   = sum(pm(s1,s2,p1,p2,d) for (s1,s2,p1,p2) in Iterators.product(1:N, 1:N, 1:N,  1:N))
 
 # (b) messages
-m_f1s1(s1) = f1(s1)
+# forward pass
+m_f1s1(s1) = f1(s1) # messages are in format m_tofrom
 m_f3s2(s2) = f3(s2)
-p_s1(s1)   = m_f1s1(s1)
-p_s2(s2)   = m_f3s2(s2)
-m_f2p1(p1) = sum(f2(s1,p1) * p_s1(s1) for s1 in 1:N)
-m_f4p2(p2) = sum(f4(s2,p2) * p_s2(s2) for s2 in 1:N)
-p_p1(p1)   = m_f2p1(p1)
-p_p2(p2)   = m_f4p2(p2)
-m_p1f5(p1) = p_p1(p1)
-m_p2f5(p2) = p_p2(p2)
+f_p_s1(s1) = m_f1s1(s1) # forward pass probs
+f_p_s2(s2) = m_f3s2(s2)
+m_f2p1(p1) = sum(f2(s1,p1) * f_p_s1(s1) for s1 in 1:N)
+m_f4p2(p2) = sum(f4(s2,p2) * f_p_s2(s2) for s2 in 1:N)
+f_p_p1(p1) = m_f2p1(p1)
+f_p_p2(p2) = m_f4p2(p2)
+m_p1f5(p1) = f_p_p1(p1)
+m_p2f5(p2) = f_p_p2(p2)
 m_f5d(d)   = sum(f5(p1, p2, d) * m_p1f5(p1) * m_p2f5(p2) for (p1, p2) in Iterators.product(1:N, 1:N))
-p_d(d)     = m_f5d(d)
+f_p_d(d)   = m_f5d(d)
 # setting y = 1
+# backward pass
 m_f6d(d)   = f6(d)
-p_d(d)     = m_f5d(d) * m_f6(d)
-m_df5(d)   = p_d(d) / m_f5d(d) * Int(m_f5d(d) > 0)
+b_p_d(d)   = m_f5d(d) * m_f6d(d) # backward pass probs
+m_df5(d)   = b_p_d(d) / m_f5d(d) * Int(m_f5d(d) > 0)
 m_f5p1(p1) = sum(f5(p1,p2,d) * m_df5(d) * m_p2f5(p2) for (p2, d) in Iterators.product(1:N, -N:N))
 m_f5p2(p2) = sum(f5(p1,p2,d) * m_df5(d) * m_p1f5(p1) for (p1, d) in Iterators.product(1:N, -N:N))
-p_p1(p1)   = m_f2p1(p1) * m_f5p1(p1)
-p_p2(p2)   = m_f4p2(p2) * m_f5p2(p2)
-m_f2s1(s1) = sum(f2(s1,p1) * p_p1(p1) / m_f2p1(p1) for p1 in 1:N)
-m_f4s2(s2) = sum(f4(s2,p2) * p_p2(p2) / m_f4p2(p2) for p2 in 1:N)
-p_s1(s1)   = m_f1s1(s1) * m_f2s1(s1)
-p_s2(s2)   = m_f3s2(s2) * m_f4s2(s2)
+b_p_p1(p1) = m_f2p1(p1) * m_f5p1(p1)
+b_p_p2(p2) = m_f4p2(p2) * m_f5p2(p2)
+m_f2s1(s1) = sum(f2(s1,p1) * b_p_p1(p1) / m_f2p1(p1) for p1 in 1:N)
+m_f4s2(s2) = sum(f4(s2,p2) * b_p_p2(p2) / m_f4p2(p2) for p2 in 1:N)
+b_p_s1(s1) = m_f1s1(s1) * m_f2s1(s1)
+b_p_s2(s2) = m_f3s2(s2) * m_f4s2(s2)
 
 # test
 function solveWithMarginals()
@@ -58,15 +60,15 @@ end
 
 function solveWithMessages()
     return [
-        [p_s1(s1) for s1 in 1:N], 
-        [p_s2(s2) for s2 in 1:N], 
-        [p_p1(p1) for p1 in 1:N], 
-        [p_p2(p2) for p2 in 1:N], 
-        [p_d(d)   for d in -N:N]
+        [b_p_s1(s1) for s1 in 1:N], 
+        [b_p_s2(s2) for s2 in 1:N], 
+        [b_p_p1(p1) for p1 in 1:N], 
+        [b_p_p2(p2) for p2 in 1:N], 
+        [b_p_d(d)   for d in -N:N]
     ]
 end
 
-@btime solveWithMarginals()
-@btime solveWithMessages()
+# @btime solveWithMarginals()
+# @btime solveWithMessages()
 println(solveWithMarginals())
 println(solveWithMessages())
