@@ -39,7 +39,8 @@ f_p_d  = OffsetArray(m_f5d, D)
 # backward pass
 m_f6d  = OffsetArray(f6.(D), D)
 b_p_d  = OffsetArray(m_f5d .* m_f6d, D) # backward pass probs
-m_df5  = OffsetArray(b_p_d ./ m_f5d .* Int.(m_f5d .> 0), D)
+m_df5  = OffsetArray(b_p_d ./ m_f5d, D)
+m_df5[isinf.(m_df5)] .= 0 # 1(m_f5d > 0)
 m_f5p1 = [sum(f5(p1,p2,d) * m_df5[d] * m_p2f5[p2] for (p2, d) in Iterators.product(1:N, -N:N)) for p1 in P1]
 m_f5p2 = [sum(f5(p1,p2,d) * m_df5[d] * m_p1f5[p1] for (p1, d) in Iterators.product(1:N, -N:N)) for p2 in P2]
 b_p_p1 = m_f2p1 .* m_f5p1
