@@ -59,7 +59,5 @@ function solveWithMessages()
     return [b_p_s1, b_p_s2, b_p_p1, b_p_p2, b_p_d]
 end
 
-@benchmark samples=1 solveWithMarginals()
-@benchmark samples=1 solveWithMessages()
-println(solveWithMarginals())
-println(solveWithMessages())
+# println("Time for solveWithMarginals: ", @elapsed solveWithMarginals()) # 28.7474562
+println("Time for solveWithMessages: ", @elapsed solveWithMessages())   #  1.4454151
