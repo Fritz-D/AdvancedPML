@@ -51,11 +51,11 @@ b_p_s2 = m_f3s2 .* m_f4s2
 # test
 function solveWithMarginals()
     return [
-        [pm_s1(s1) for s1 in 1:N], 
-        [pm_s2(s2) for s2 in 1:N], 
-        [pm_p1(p1) for p1 in 1:N], 
-        [pm_p2(p2) for p2 in 1:N], 
-        [pm_d(d)   for d in -N:N]
+        pm_s1.(S1), 
+        pm_s2.(S2), 
+        pm_p1.(P1), 
+        pm_p2.(P2), 
+        pm_d.(D)
     ]
 end
 
